@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://fastui.ndugram.dev/ru/latest/logo.png" style="background:white; padding:12px; border-radius:10px; width:350">
+  <img src="https://fastui2.readthedocs.io/ru/latest/logo.png" style="background:white; padding:12px; border-radius:10px; width:350">
 </p>
 <p align="center">
     <em>FastUI — build web UIs with Python decorators, compile to HTML, zero JavaScript required.</em>
@@ -27,7 +27,7 @@
 
 ---
 
-**Documentation**: <a href="https://fastui.ndugram.dev/ru/latest/" target="_blank">https://fastui.ndugram.dev/ru/latest/</a>
+**Documentation**: <a href="https://fastui2.readthedocs.io/ru/latest/" target="_blank">https://fastui2.readthedocs.io/ru/latest/</a>
 
 **Source Code**: <a href="https://github.com/ndugram/fastui2" target="_blank">https://github.com/ndugram/fastui2</a>
 

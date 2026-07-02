@@ -18,7 +18,7 @@
 
 ---
 
-**Documentation**: <a href="https://fastui.ndugram.dev/en/latest/" target="_blank">https://fastui.ndugram.dev/en/latest/</a>
+**Documentation**: <a href="https://fastui2.readthedocs.io/en/latest/" target="_blank">https://fastui2.readthedocs.io/en/latest/</a>
 
 **Source Code**: <a href="https://github.com/ndugram/fastui2" target="_blank">https://github.com/ndugram/fastui2</a>
 

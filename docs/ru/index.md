@@ -18,7 +18,7 @@
 
 ---
 
-**Документация**: <a href="https://fastui.ndugram.dev/ru/latest/" target="_blank">https://fastui.ndugram.dev/ru/latest/</a>
+**Документация**: <a href="https://fastui2.readthedocs.io/ru/latest/" target="_blank">https://fastui2.readthedocs.io/ru/latest/</a>
 
 **Исходный код**: <a href="https://github.com/ndugram/fastui2" target="_blank">https://github.com/ndugram/fastui2</a>
 
