@@ -31,10 +31,35 @@ class App(
 ## `@app.page()`
 
 ```python
-@app.page(pattern: str, title: str = "", tags: list[str] | None = None)
+@app.page(
+    pattern: str,
+    title: str = "",
+    tags: list[str] | None = None,
+    summary: str = "",
+    description: str = "",
+)
 ```
 
 Зарегистрировать маршрут страницы.
+
+**Параметры:**
+
+| Параметр | Тип | Описание |
+|---|---|---|
+| `pattern` | `str` | URL-паттерн. Поддерживает статические пути (`/about`) и типизированные параметры (`/user/{id:int}`). |
+| `title` | `str` | Заголовок страницы для HTML-тега `<title>`. |
+| `tags` | `list[str]` | OpenAPI-теги для группировки маршрутов. |
+| `summary` | `str` | Краткое описание для OpenAPI operation summary. Переопределяет summary из docstring. |
+| `description` | `str` | Полное описание для OpenAPI operation. Переопределяет description из docstring. Поддерживает Markdown. |
+
+**Пример:**
+
+```python
+@app.page("/", title="Home", tags=["pages"],
+          summary="Application home page",
+          description="The main entry point.")
+def home(): ...
+```
 
 ## `@app.setter()`
 
