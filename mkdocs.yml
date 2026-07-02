@@ -1,6 +1,6 @@
 site_name: FastUI
 site_description: FastUI framework, build web UIs with Python decorators, compile to HTML, zero JavaScript required
-site_url: https://fastui.ndugram.dev
+site_url: https://fastui2.readthedocs.io
 
 docs_dir: docs
 theme:
