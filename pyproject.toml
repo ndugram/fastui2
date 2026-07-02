@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastui2"
+version = "0.0.1"
+description = "Build web UIs with Python decorators, compile to HTML, zero JavaScript required"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "White NEFOR", email = "n7for8572@gmail.com"},
+]
+maintainers = [
+    {name = "White NEFOR", email = "n7for8572@gmail.com"},
+]
+keywords = [
+    "fastui",
+    "ui",
+    "web",
+    "html",
+    "decorators",
+    "python",
+    "pydantic",
+    "no-js",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: User Interfaces",
+    "Typing :: Typed",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "annotated-doc>=0.0.4",
+    "pydantic>=2.13.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.15.15",
+    "mypy>=1.15.0",
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "pymdown-extensions>=10.21.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/ndugram/fastui2"
+Documentation = "https://fastui.ndugram.dev"
+Repository = "https://github.com/ndugram/fastui2"
+Issues = "https://github.com/ndugram/fastui2/issues"
+
+[tool.setuptools.packages.find]
+include = ["fastui*"]
+exclude = ["site*"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = "annotated_doc.*"
+ignore_missing_imports = true
