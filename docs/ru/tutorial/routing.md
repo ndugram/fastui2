@@ -58,6 +58,21 @@ def user_profile(id: int): ...
 def about(): ...
 ```
 
+## Summary & Description
+
+Параметры `summary` и `description` обогащают OpenAPI-схему:
+
+```python
+@app.page(
+    "/",
+    summary="Application home page",
+    description="The main entry point showing links to all sections.",
+)
+def home(): ...
+```
+
+Если не указаны, извлекаются из docstring обработчика (первая строка → summary, остальное → description).
+
 ## Теги
 
 Параметр `tags` группирует маршруты в документации:
