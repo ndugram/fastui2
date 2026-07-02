@@ -60,6 +60,8 @@ app.stylesheets.append("https://example.com/theme.css")
     pattern: str,
     title: str = "",
     tags: list[str] | None = None,
+    summary: str = "",
+    description: str = "",
 )
 ```
 
@@ -72,11 +74,15 @@ Register a page route via decorator.
 | `pattern` | `str` | URL pattern. Supports static paths (`/about`) and typed parameters (`/user/{id:int}`). |
 | `title` | `str` | Optional page title rendered inside the HTML `<title>` tag. |
 | `tags` | `list[str]` | OpenAPI tags for grouping routes in documentation. |
+| `summary` | `str` | Short description for the OpenAPI operation summary. Overrides the docstring-based summary. |
+| `description` | `str` | Full description for the OpenAPI operation. Overrides the docstring-based description. Supports Markdown. |
 
 **Example:**
 
 ```python
-@app.page("/", title="Home", tags=["pages"])
+@app.page("/", title="Home", tags=["pages"],
+          summary="Application home page",
+          description="The main entry point showing links to all sections.")
 def home():
     return [ui.heading("Home", level=1)]
 ```
