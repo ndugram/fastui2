@@ -57,7 +57,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/ndugram/fastui2"
-Documentation = "https://fastui.ndugram.dev"
+Documentation = "https://fastui2.readthedocs.io"
 Repository = "https://github.com/ndugram/fastui2"
 Issues = "https://github.com/ndugram/fastui2/issues"
 
