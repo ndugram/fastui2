@@ -49,8 +49,8 @@ theme:
   logo: logo.png
   favicon: logo.png
 
-repo_name: ndugram/fastui
-repo_url: https://github.com/ndugram/fastui
+repo_name: ndugram/fastui2
+repo_url: https://github.com/ndugram/fastui2
 extra_css:
   - stylesheets/extra.css
 
@@ -124,7 +124,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/ndugram/fastui
+      link: https://github.com/ndugram/fastui2
   alternate:
     - link: /
       name: en - English
