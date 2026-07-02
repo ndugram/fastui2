@@ -30,3 +30,12 @@ Complete API reference for FastUI.
 | `ui.code()` | Create a code component |
 | `ui.divider()` | Create a divider component |
 | `ui.page()` | Create a page container component |
+| `ui.image()` | Create an image component |
+| `ui.select()` / `ui.option()` | Create a select dropdown |
+| `ui.checkbox()` | Create a checkbox component |
+| `ui.textarea()` | Create a textarea component |
+| `ui.table()` | Create a table component |
+| `ui.alert()` | Create an alert banner |
+| `ui.badge()` | Create a status badge |
+| `ui.card()` | Create a card component |
+| `ui.navbar()` | Create a navbar component |
