@@ -97,6 +97,22 @@ If not provided, the title is derived from the pattern:
 | `/about` | `About` |
 | `/user/{id:int}` | `User` |
 
+## Summary & Description
+
+The `summary` and `description` parameters enrich the OpenAPI schema:
+
+```python
+@app.page(
+    "/",
+    summary="Application home page",
+    description="The main entry point showing links to all sections.",
+)
+def home():
+    return [ui.heading("Home", level=1)]
+```
+
+When not provided, they are extracted from the handler's docstring (first line → summary, rest → description).
+
 ## Tags
 
 The `tags` parameter groups routes in the OpenAPI documentation:
