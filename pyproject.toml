@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastui2"
-version = "0.0.1"
+version = "0.1.0"
 description = "Build web UIs with Python decorators, compile to HTML, zero JavaScript required"
 readme = "README.md"
 license = {text = "MIT"}
