@@ -39,3 +39,4 @@ Complete API reference for FastUI.
 | `ui.badge()` | Create a status badge |
 | `ui.card()` | Create a card component |
 | `ui.navbar()` | Create a navbar component |
+| `ui.form()` | Create a form that POSTs field values to `on_submit` |

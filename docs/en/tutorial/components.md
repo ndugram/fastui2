@@ -282,6 +282,34 @@ ui.navbar("MyApp", [
 
 Renders a `<nav>` with a brand label and one link per `(label, url)` pair — handy for a shared header across pages.
 
+## Form — real form submission
+
+Unlike the other components so far, `ui.form()` actually talks to the server. It wraps its children in
+a `<form>`; a plain `ui.button("Submit")` inside it (no `on_click`) submits it natively, and `on_submit`
+receives the collected field values:
+
+```python
+def handle_submit(data: dict):
+    return [
+        ui.heading("Thanks!", level=2),
+        ui.text(f"Name: {data.get('name')}"),
+    ]
+
+ui.form([
+    ui.input(label="Name", name="name"),
+    ui.input(label="Email", name="email", type="email"),
+    ui.button("Submit"),
+], on_submit=handle_submit)
+```
+
+Behind the scenes: every page ships a tiny inline script that intercepts the submit event, builds a
+`FormData` from every named field in the form, and POSTs it to a generated `/_ui/action/...` URL. The
+handler runs on the server, and whatever component list it returns replaces the entire page body —
+same mechanism as a `Button.on_click` server action, just with the form's field values passed in.
+
+This also means clicking a server-action button (`ui.button("...", on_click=my_handler)`) works the
+same way under the hood — it POSTs and swaps the body, it just has no fields to collect.
+
 ## Styling Every Component
 
 All components accept `id`, `class_name`, and `style`:

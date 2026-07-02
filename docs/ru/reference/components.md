@@ -146,6 +146,43 @@ class Navbar(brand: str = "", links: list[tuple[str, str]] = [], id: str = "", c
 
 Рендерит `<nav>` с `.nav-brand` и ссылками `.nav-link` из пар `(label, url)`.
 
+## Form
+
+```python
+class Form(components: list[Component] = [], on_submit: str | FormActionHandler | None = None, id: str = "", class_name: str = "", style: str = "")
+```
+
+Рендерит `<form>...</form>`. Если `on_submit` — callable, `App._walk_components` регистрирует его как
+серверный экшен, и форма получает `onsubmit="return _fastuiSubmit(event, '/_ui/action/...')"`. При
+сабмите встроенный на каждой странице JS собирает значения всех именованных полей формы через
+`FormData`, постит их на этот URL и заменяет `document.body.innerHTML` на вернувшийся HTML-фрагмент.
+Обычная `ui.button("Отправить")` (без `on_click`) внутри формы сабмитит её нативно — у `<button>` тип
+по умолчанию `submit`.
+
+```python
+ui.form([
+    ui.input(label="Имя", name="name"),
+    ui.button("Отправить"),
+], on_submit=handle_submit)  # def handle_submit(data: dict[str, str]) -> list[Component]
+```
+
+## FormActionHandler
+
+```python
+FormActionHandler: TypeAlias = Callable[[dict[str, str]], list[Component]]
+```
+
+Обработчик сабмита формы: принимает `dict[str, str]` с отправленными значениями полей, возвращает список компонентов.
+
+## Как на самом деле работают серверные экшены
+
+На каждой странице есть встроенный `<script>` (`_fastuiAction`/`_fastuiSubmit`), который перехватывает
+клик по кнопке или сабмит формы, шлёт `fetch(url, {method: "POST", ...})` на `/_ui/action/<id>` и
+заменяет `document.body.innerHTML` на HTML из ответа. Сервер разбирает тело POST через
+`urllib.parse.parse_qsl` и вызывает обработчик с этим словарём, если он принимает аргумент, либо без
+аргументов — так `ActionHandler` (0 аргументов) и `FormActionHandler` (1 аргумент) работают через один
+и тот же механизм.
+
 ## `_UI` Builder
 
 ```python
@@ -167,4 +204,5 @@ ui.alert(...)       # → Alert
 ui.badge(...)       # → Badge
 ui.card(...)        # → Card
 ui.navbar(...)      # → Navbar
+ui.form(...)        # → Form
 ```

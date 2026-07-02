@@ -368,6 +368,43 @@ Renders a `<nav>` with a `.nav-brand` span and one `.nav-link` anchor per `(labe
 
 ---
 
+## `Form`
+
+```python
+class Form(
+    components: list[Component] = [],
+    on_submit: str | FormActionHandler | None = None,
+    id: str = "",
+    class_name: str = "",
+    style: str = "",
+)
+```
+
+```python
+model_config = {"arbitrary_types_allowed": True}
+```
+
+Renders `<form>...</form>`. When `on_submit` is a callable, `App._walk_components` registers it as a
+server-side action and the form renders `onsubmit="return _fastuiSubmit(event, '/_ui/action/...')"`.
+On submit, client-side JS (embedded in every page) collects the values of every named field inside the
+form via `FormData`, POSTs them to the action URL, and replaces `document.body.innerHTML` with the
+returned HTML fragment. A plain `Button(text="Submit")` (no `on_click`) inside the form triggers this
+natively — `<button>` defaults to `type="submit"`.
+
+**Example:**
+
+```python
+Form(
+    components=[
+        Input(label="Name", name="name"),
+        Button(text="Send"),
+    ],
+    on_submit=handle_submit,  # def handle_submit(data: dict[str, str]) -> list[Component]
+)
+```
+
+---
+
 ## `Component` Protocol
 
 ```python
@@ -385,7 +422,31 @@ custom components, third-party wrappers, and Pydantic models to be used intercha
 ActionHandler: TypeAlias = Callable[[], list[Component]]
 ```
 
-Zero-argument callable that returns a list of components. Used for server-side click handlers.
+Zero-argument callable that returns a list of components. Used for server-side click handlers
+(`Button.on_click`).
+
+## `FormActionHandler` TypeAlias
+
+```python
+FormActionHandler: TypeAlias = Callable[[dict[str, str]], list[Component]]
+```
+
+Callable that receives the submitted field values as a `dict[str, str]` and returns a component
+list. Used for form submit handlers (`Form.on_submit`).
+
+## How server actions actually work
+
+Every page includes a small inline `<script>` (`_fastuiAction` / `_fastuiSubmit`) that:
+
+1. Intercepts the button click or form submit client-side.
+2. Sends a `fetch(url, {method: "POST", body})` to the registered `/_ui/action/<id>` endpoint —
+   `body` is a `URLSearchParams` built from the form's `FormData` for forms, or empty for buttons.
+3. Replaces `document.body.innerHTML` with the HTML fragment returned by the handler.
+
+The server parses the POST body with `urllib.parse.parse_qsl` and calls the handler with the parsed
+`dict[str, str]` if it declares a parameter, or with no arguments otherwise — so the same `ActionHandler`
+(zero-arg) and `FormActionHandler` (one-arg) callables both work through `Button.on_click` /
+`Form.on_submit` without extra configuration.
 
 ## `_UI` Builder
 
@@ -412,4 +473,5 @@ ui.alert(...)       # → Alert
 ui.badge(...)       # → Badge
 ui.card(...)        # → Card
 ui.navbar(...)      # → Navbar
+ui.form(...)        # → Form
 ```

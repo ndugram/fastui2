@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import http.server
+import inspect
 import json
 import os
 import threading
 import time
 import webbrowser
+from html import escape
 from typing import Annotated, Callable
+from urllib.parse import parse_qsl
 import re as _re
 import unicodedata as _uc
 
@@ -14,10 +17,14 @@ import unicodedata as _uc
 from annotated_doc import Doc
 
 from .components import (
+    ACTION_URL_PREFIX,
     DEFAULT_CSS,
     ActionHandler,
     Button,
+    Card,
     Component,
+    Form,
+    FormActionHandler,
     Page,
 )
 from .openapi import generate_openapi_schema, get_docs_html
@@ -40,6 +47,28 @@ RELOAD_SCRIPT: str = (
     '</script>'
 )
 
+ACTION_SCRIPT: str = (
+    '<script>'
+    'function _fastuiSwap(html){document.body.innerHTML=html;}'
+    'function _fastuiAction(url){'
+    'fetch(url,{method:"POST"})'
+    '.then(function(r){return r.text();})'
+    '.then(_fastuiSwap)'
+    '.catch(function(e){console.error(e);});'
+    'return false;'
+    '}'
+    'function _fastuiSubmit(event,url){'
+    'event.preventDefault();'
+    'var data=new URLSearchParams(new FormData(event.target));'
+    'fetch(url,{method:"POST",body:data})'
+    '.then(function(r){return r.text();})'
+    '.then(_fastuiSwap)'
+    '.catch(function(e){console.error(e);});'
+    'return false;'
+    '}'
+    '</script>'
+)
+
 TEMPLATE: str = (
     '<!DOCTYPE html>\n'
     '<html lang="ru">\n'
@@ -52,6 +81,7 @@ TEMPLATE: str = (
     '</head>\n'
     '<body>\n'
     '{body}\n'
+    '{action_script}\n'
     '{reload_script}\n'
     '</body>\n'
     '</html>'
@@ -122,19 +152,25 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         app = self.app_instance
         assert app is not None
 
-        if path.startswith("/_ui/action/"):
-            action_id = path.split("/_ui/action/")[-1]
+        if path.startswith(ACTION_URL_PREFIX):
+            action_id = path[len(ACTION_URL_PREFIX):]
             handler = app._action_handlers.get(action_id)
             if handler:
                 try:
-                    components = handler()
+                    content_length = int(self.headers.get("Content-Length") or 0)
+                    body = self.rfile.read(content_length) if content_length else b""
+                    form_data = dict(parse_qsl(body.decode("utf-8")))
+                    if inspect.signature(handler).parameters:
+                        components = handler(form_data)
+                    else:
+                        components = handler()
                     html = app._render_fragment(components)
                     self.send_html(html, 200)
                     self._log(200)
                     return
                 except Exception as exc:
                     self.send_html(
-                        f"<h1>500</h1><p>{exc}</p>", 500
+                        f"<h1>500</h1><p>{escape(str(exc))}</p>", 500
                     )
                     self._log(500)
                     return
@@ -177,7 +213,8 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         reset = "\033[0m"
         bold = "\033[1m"
         blue = "\033[94m"
-        url = f"http://{self.server.server_name}:{self.server.server_port}{self.path}"  # type: ignore[attr-defined]
+        host = self.headers.get("Host", f"{self.server.server_address[0]}:{self.server.server_address[1]}")  # type: ignore[attr-defined]
+        url = f"http://{host}{self.path}"
         print(f"  {blue}{bold}{self.command}{reset} {url} {colour}{status}{reset}")
 
     def log_message(
@@ -261,7 +298,7 @@ class App:
         self.stylesheets: list[str] = []
         self._build_id: int = 0
         self._hot_reload: bool = False
-        self._action_handlers: dict[str, ActionHandler] = {}
+        self._action_handlers: dict[str, ActionHandler | FormActionHandler] = {}
         self._action_counter: int = 0
         self._primary_redirect_target: str = ""
         self._docs_enabled: bool = docs
@@ -347,13 +384,16 @@ class App:
 
     def action(
         self,
-        handler: Annotated[ActionHandler, Doc("Zero-argument callable.")],
+        handler: Annotated[
+            ActionHandler | FormActionHandler,
+            Doc("Zero-argument callable, or one accepting submitted field values."),
+        ],
     ) -> str:
         """Register a server-side action handler and return its URL."""
         self._action_counter += 1
         action_id = f"a{self._action_counter}"
         self._action_handlers[action_id] = handler
-        return f"/_ui/action/{action_id}"
+        return f"{ACTION_URL_PREFIX}{action_id}"
 
     def _walk_components(
         self,
@@ -363,6 +403,15 @@ class App:
         for i, comp in enumerate(components):
             if isinstance(comp, Page):
                 self._walk_components(comp.components)
+            elif isinstance(comp, Card):
+                self._walk_components(comp.header)
+                self._walk_components(comp.body)
+                self._walk_components(comp.footer)
+            elif isinstance(comp, Form):
+                self._walk_components(comp.components)
+                if callable(comp.on_submit):
+                    comp.on_submit = self.action(comp.on_submit)
+                    components[i] = comp
             elif isinstance(comp, Button) and callable(comp.on_click):
                 comp.on_click = self.action(comp.on_click)
                 components[i] = comp
@@ -400,6 +449,7 @@ class App:
             css=self.css,
             stylesheets=stylesheets,
             body=body,
+            action_script=ACTION_SCRIPT,
             reload_script=reload_script,
         )
 

@@ -22,7 +22,9 @@ When `on_click` receives a callable:
 
 1. The framework registers it as a POST endpoint at `/_ui/action/<id>`
 2. Before rendering, `_walk_components()` replaces the callable with the action URL
-3. In the browser, clicking the button navigates to the action URL via POST
+3. The button renders `onclick="return _fastuiAction('/_ui/action/a1')"` — a small inline script
+   (shipped on every page) that fetches that URL via `POST` and swaps `document.body.innerHTML`
+   with the response, so no full page reload happens
 4. The server calls the handler and returns the rendered components as HTML
 
 ## How It Works
@@ -33,14 +35,15 @@ Browser                          Server
   ├── GET / ──────────────────────►│
   │                                ├── Button(on_click=handle_click)
   │                                ├── _walk_components() replaces it
-  │                                ├── Renders: <button onclick="location.href='/_ui/action/a1'">
+  │                                ├── Renders: <button onclick="return _fastuiAction('/_ui/action/a1')">
   │◄──── HTML ─────────────────────┤
   │                                │
   ├── click button ───────────────►│
-  ├── POST /_ui/action/a1 ───────►│
+  ├── fetch POST /_ui/action/a1 ──►│
   │                                ├── Calls handle_click()
   │                                ├── Renders returned components
-  │◄──── HTML ─────────────────────┤
+  │◄──── HTML fragment ────────────┤
+  ├── document.body.innerHTML = … │
 ```
 
 ## State Management
@@ -114,6 +117,27 @@ current page content (it is not inserted in-place).
 | State | No server state | Can modify state |
 
 Use string URLs for navigation and callables for server-side logic.
+
+## Forms: actions with field values
+
+A `Button.on_click` action takes no arguments — it's built for clicks, not data entry. For actual
+form fields, use `ui.form()`: it collects every named field inside it and passes them to the handler
+as a `dict[str, str]`.
+
+```python
+def handle_submit(data: dict):
+    return [ui.heading(f"Hi, {data.get('name')}!", level=2)]
+
+ui.form([
+    ui.input(label="Name", name="name"),
+    ui.button("Submit"),  # no on_click — submits the form natively
+], on_submit=handle_submit)
+```
+
+Under the hood this uses the same `/_ui/action/<id>` + `fetch` + body-swap mechanism as button
+actions — the only difference is the request body carries the form's `FormData`, and the server
+parses it into the `dict` your handler receives. See [Components → Form](components.md#form-real-form-submission)
+for details.
 
 ## Next Steps
 

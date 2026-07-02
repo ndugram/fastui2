@@ -72,6 +72,12 @@ nav {
 ActionHandler: TypeAlias = Callable[[], list["Component"]]
 """Signature for click handlers: a zero-argument callable that returns a list of components."""
 
+FormActionHandler: TypeAlias = Callable[[dict[str, str]], list["Component"]]
+"""Signature for form submit handlers: receives submitted field values, returns a component list."""
+
+ACTION_URL_PREFIX: str = "/_ui/action/"
+"""URL prefix used for server-side action/submit endpoints registered by :class:`App`."""
+
 
 @runtime_checkable
 class Component(Protocol):
@@ -160,7 +166,9 @@ class Button(BaseModel):
     The ``on_click`` field accepts either a URL string (rendered as a client-side
     ``location.href`` navigation) or a callable (registered as a server-side action).
     When a callable is provided, the :meth:`App._walk_components` method replaces
-    it with a generated action URL before rendering.
+    it with a generated action URL before rendering, and the button issues a
+    ``fetch()`` POST to that URL on click, replacing the page body with the
+    returned HTML fragment.
     """
 
     model_config = {"arbitrary_types_allowed": True}
@@ -182,7 +190,10 @@ class Button(BaseModel):
     def to_html(self) -> str:
         extra: dict[str, str | None] = {}
         if isinstance(self.on_click, str) and self.on_click:
-            extra["onclick"] = f"location.href='{escape(self.on_click)}'"
+            if self.on_click.startswith(ACTION_URL_PREFIX):
+                extra["onclick"] = f"return _fastuiAction('{escape(self.on_click)}')"
+            else:
+                extra["onclick"] = f"location.href='{escape(self.on_click)}'"
         attrs = _build_attrs(self.id, self.class_name, self.style, **extra)
         attrs = f" {attrs}" if attrs else ""
         return f"<button{attrs}>{escape(self.text)}</button>"
@@ -600,6 +611,47 @@ class Navbar(BaseModel):
         return f"<nav{attrs}>\n{brand}{links}\n</nav>"
 
 
+class Form(BaseModel):
+    """
+    A real HTML form that submits its named fields to a server action.
+
+    Wraps ``components`` in a ``<form>``. When ``on_submit`` is a callable,
+    :meth:`App._walk_components` registers it as a server-side action and the
+    form intercepts its ``submit`` event, collects the values of every named
+    ``Input``/``Select``/``Checkbox``/``Textarea`` inside it, and POSTs them
+    to the server — the handler receives a ``dict[str, str]`` of field values
+    and returns a component list that replaces the page body.
+
+    A plain ``ui.button("Submit")`` (``on_click=None``) placed inside the form
+    triggers this natively, since ``<button>`` defaults to ``type="submit"``.
+    """
+
+    model_config = {"arbitrary_types_allowed": True}
+
+    components: Annotated[
+        list[Component], Doc("Form fields and other child components.")
+    ] = Field(default_factory=list)
+    on_submit: Annotated[
+        str | FormActionHandler | None,
+        Doc(
+            "URL string or a callable receiving submitted field values "
+            "(``dict[str, str]``) and returning a component list."
+        ),
+    ] = None
+    id: Annotated[str, Doc("HTML ``id`` attribute.")] = ""
+    class_name: Annotated[str, Doc("CSS class name.")] = ""
+    style: Annotated[str, Doc("Inline CSS style string.")] = ""
+
+    def to_html(self) -> str:
+        inner = "\n".join(c.to_html() for c in self.components)
+        attrs = _build_attrs(self.id, self.class_name, self.style)
+        attrs = f" {attrs}" if attrs else ""
+        onsubmit = ""
+        if isinstance(self.on_submit, str) and self.on_submit:
+            onsubmit = f" onsubmit=\"return _fastuiSubmit(event, '{escape(self.on_submit)}')\""
+        return f"<form{attrs}{onsubmit}>\n{inner}\n</form>"
+
+
 class _UI:
     """
     Convenience builder for creating component instances.
@@ -928,6 +980,20 @@ class _UI:
     ) -> Navbar:
         """Create a :class:`Navbar` component."""
         return Navbar(brand=brand, links=links, id=id, class_name=class_name, style=style)
+
+    def form(
+        self,
+        components: Annotated[list[Component], Doc("Form fields and other child components.")] = [],
+        on_submit: Annotated[
+            str | FormActionHandler | None,
+            Doc("URL or callable receiving submitted field values as a dict."),
+        ] = None,
+        id: Annotated[str, Doc("HTML ``id`` attribute.")] = "",
+        class_name: Annotated[str, Doc("CSS class name.")] = "",
+        style: Annotated[str, Doc("Inline CSS style.")] = "",
+    ) -> Form:
+        """Create a :class:`Form` component."""
+        return Form(components=components, on_submit=on_submit, id=id, class_name=class_name, style=style)
 
 
 ui = _UI()
