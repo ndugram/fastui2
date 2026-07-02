@@ -1,4 +1,4 @@
-"""Customize OpenAPI documentation metadata and tags."""
+"""Customize OpenAPI documentation metadata and tags with summary & description."""
 
 from fastui import App, ui
 
@@ -11,7 +11,13 @@ app = App(
 )
 
 
-@app.page("/", title="Home", tags=["pages"])
+@app.page(
+    "/",
+    title="Home",
+    tags=["pages"],
+    summary="Application home page",
+    description="The main entry point showing links to all sections.",
+)
 def home():
     """Home page of the application."""
     return [
@@ -23,7 +29,7 @@ def home():
     ]
 
 
-@app.page("/users", title="Users", tags=["users"])
+@app.page("/users", title="Users", tags=["users"], summary="List all registered users")
 def users():
     """List all users."""
     return [
@@ -33,7 +39,13 @@ def users():
     ]
 
 
-@app.page("/items", title="Items", tags=["items"])
+@app.page(
+    "/items",
+    title="Items",
+    tags=["items"],
+    summary="Browse available items",
+    description="Shows the full catalog of items with search and filter options.",
+)
 def items():
     """Browse available items."""
     return [
