@@ -170,6 +170,118 @@ ui.page([
 ], style="background: #f0f0ff; padding: 1rem; border-radius: 8px;")
 ```
 
+## Image
+
+```python
+ui.image(
+    src="/logo.png",      # Image URL, min_length=1
+    alt="Logo",            # Alt text
+    width=None,             # e.g. "100%", "200px"
+    height=None,
+    id="",
+    class_name="",
+    style="",
+)
+```
+
+Renders as `<img src="/logo.png" alt="Logo">`.
+
+## Select
+
+```python
+ui.select(
+    label="Country",
+    name="country",
+    options=[
+        ui.option("Select...", ""),
+        ui.option("USA", "us"),
+        ui.option("Canada", "ca", selected=True),
+    ],
+)
+```
+
+`ui.option()` builds a `SelectOption` — it's only ever used nested inside `options=[...]`, never returned on its own from a page handler.
+
+Renders as `<label>Country<select name="country"><option value="">Select...</option>...</select></label>`.
+
+## Checkbox
+
+```python
+ui.checkbox(
+    label="Accept terms",
+    name="terms",
+    checked=False,
+)
+```
+
+Renders as `<label class="checkbox-group"><input type="checkbox" name="terms">Accept terms</label>`.
+
+## Textarea
+
+```python
+ui.textarea(
+    label="Comments",
+    name="comments",
+    placeholder="Write your thoughts...",
+    rows=4,
+)
+```
+
+Renders as a `<label>` wrapping a `<textarea>` with the given row count.
+
+## Table
+
+```python
+ui.table(
+    headers=["Name", "Email", "Role"],
+    rows=[
+        ["Alice", "alice@example.com", "Admin"],
+        ["Bob", "bob@example.com", "User"],
+    ],
+)
+```
+
+Renders a `<table>` with a `<thead>` built from `headers` and a `<tbody>` built from `rows`.
+
+## Alert
+
+```python
+ui.alert("Saved successfully!", type="success")
+```
+
+`type` is one of `info`, `success`, `warning`, `error` — each maps to a distinct color scheme via CSS classes `alert alert-{type}`.
+
+## Badge
+
+```python
+ui.badge("New", type="primary")
+```
+
+`type` is one of `default`, `primary`, `success`, `warning`, `error`. Useful for inline status labels next to text.
+
+## Card
+
+```python
+ui.card(
+    header=[ui.heading("Card Title", level=3)],
+    body=[ui.text("This is the card body.")],
+    footer=[ui.button("Action")],
+)
+```
+
+Renders a `.card` div with `.card-header`/`.card-body`/`.card-footer` sections — any section left empty is simply omitted.
+
+## Navbar
+
+```python
+ui.navbar("MyApp", [
+    ("Home", "/"),
+    ("About", "/about"),
+])
+```
+
+Renders a `<nav>` with a brand label and one link per `(label, url)` pair — handy for a shared header across pages.
+
 ## Styling Every Component
 
 All components accept `id`, `class_name`, and `style`:
