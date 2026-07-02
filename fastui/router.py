@@ -37,6 +37,8 @@ class Route:
     ]
     title: Annotated[str, Doc("Optional page title for the HTML template.")] = ""
     tags: Annotated[list[str], Doc("OpenAPI tags for grouping routes.")] = field(default_factory=list)
+    summary: Annotated[str, Doc("Short description for OpenAPI operation summary.")] = ""
+    description: Annotated[str, Doc("Full description for OpenAPI operation.")] = ""
 
 
 class Router:
@@ -74,6 +76,12 @@ class Router:
         tags: Annotated[
             list[str], Doc("OpenAPI tags for grouping routes in docs.")
         ] | None = None,
+        summary: Annotated[
+            str, Doc("Short description for OpenAPI operation summary.")
+        ] = "",
+        description: Annotated[
+            str, Doc("Full description for OpenAPI operation.")
+        ] = "",
     ) -> None:
         """Register a new route.
 
@@ -86,6 +94,8 @@ class Router:
             handler: Callable invoked when the route is matched.
             title: Optional title passed to the HTML template.
             tags: OpenAPI tags for grouping routes in the documentation.
+            summary: Short description for the OpenAPI operation summary.
+            description: Full description for the OpenAPI operation.
 
         Raises:
             ValueError: If a parameter definition is malformed (empty name).
@@ -121,6 +131,8 @@ class Router:
                 regex=re.compile(regex_str),
                 title=title,
                 tags=tags or [],
+                summary=summary,
+                description=description,
             )
         )
 
