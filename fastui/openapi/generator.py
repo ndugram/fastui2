@@ -106,8 +106,8 @@ def generate_openapi_schema(
         if not hasattr(route.handler, "__name__"):
             continue
 
-        summary = _extract_summary(route.handler)
-        description = _extract_description(route.handler)
+        summary = route.summary or _extract_summary(route.handler)
+        description = route.description or _extract_description(route.handler)
         handler_name = route.handler.__name__
 
         path_key = re.sub(r"\{(\w+):\w+\}", r"{\1}", route.pattern)
