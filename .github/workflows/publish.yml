@@ -42,19 +42,20 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           TAG="${{ steps.version.outputs.tag }}"
+          REPO="${{ github.repository }}"
           PREV_TAG=$(git tag --sort=-version:refname | grep -v "^$TAG$" | head -1)
 
           if [ -n "$PREV_TAG" ]; then
-            CHANGES=$(git log --oneline "$PREV_TAG..HEAD" 2>/dev/null || echo "")
+            CHANGES=$(git log --format="* [%h](https://github.com/${REPO}/commit/%H) %s" "$PREV_TAG..HEAD" 2>/dev/null || echo "")
           else
-            CHANGES=$(git log --oneline -30 2>/dev/null || echo "Initial release")
+            CHANGES=$(git log --format="* [%h](https://github.com/${REPO}/commit/%H) %s" -30 2>/dev/null || echo "* Initial release")
           fi
 
           if [ -z "$CHANGES" ]; then
-            CHANGES="Minor fixes and improvements"
+            CHANGES="* Minor fixes and improvements"
           fi
 
-          PROMPT="Generate concise release notes in English for this FastUI release. Structure the output as bullet points grouped by category (Features, Bug Fixes, etc.). Base it on these commits:\n\n${CHANGES}"
+          PROMPT="Generate release notes in English for this FastUI release. Structure the output with Markdown headings (## Features, ## Bug Fixes, ## Other Changes). Under each heading, include the relevant commits as bullet points with their original Markdown links. Add a short description for each group. Here are the commits:\n\n${CHANGES}"
 
           RESPONSE=$(curl -s -X POST "https://openrouter.ai/api/v1/chat/completions" \
             -H "Authorization: Bearer ${OPENROUTER_API_KEY}" \
@@ -62,12 +63,12 @@ jobs:
             -d "$(jq -n \
               --arg model "openai/gpt-oss-120b:free" \
               --arg prompt "$PROMPT" \
-              '{model: $model, messages: [{role: "user", content: $prompt}], max_tokens: 500}')")
+              '{model: $model, messages: [{role: "user", content: $prompt}], max_tokens: 1000}')")
 
           AI_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // ""')
 
           if [ -z "$AI_TEXT" ]; then
-            AI_TEXT="$CHANGES"
+            AI_TEXT="## Changes\n\n${CHANGES}"
           fi
 
           echo "$AI_TEXT" > release_body.md
