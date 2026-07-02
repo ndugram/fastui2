@@ -5,8 +5,8 @@
     <em>FastUI — build web UIs with Python decorators, compile to HTML, zero JavaScript required.</em>
 </p>
 <p align="center">
-<a href="https://github.com/ndugram/fastui/actions/workflows/tests.yml" target="_blank">
-    <img src="https://github.com/ndugram/fastui/actions/workflows/tests.yml/badge.svg" alt="Tests">
+<a href="https://github.com/ndugram/fastui2/actions/workflows/tests.yml" target="_blank">
+    <img src="https://github.com/ndugram/fastui2/actions/workflows/tests.yml/badge.svg" alt="Tests">
 </a>
 <a href="https://pypi.org/project/fastui2" target="_blank">
     <img src="https://img.shields.io/pypi/v/fastui2?color=%2334D058&label=pypi%20package" alt="Package version">
@@ -29,7 +29,7 @@
 
 **Documentation**: <a href="https://fastui.ndugram.dev/ru/latest/" target="_blank">https://fastui.ndugram.dev/ru/latest/</a>
 
-**Source Code**: <a href="https://github.com/ndugram/fastui" target="_blank">https://github.com/ndugram/fastui</a>
+**Source Code**: <a href="https://github.com/ndugram/fastui2" target="_blank">https://github.com/ndugram/fastui2</a>
 
 ---
 
