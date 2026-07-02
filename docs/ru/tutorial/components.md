@@ -84,6 +84,92 @@ ui.page([
 
 Рендерится как `<div>...</div>`.
 
+## Image
+
+```python
+ui.image("/logo.png", alt="Логотип", width="200px")
+```
+
+Рендерится как `<img src="/logo.png" alt="Логотип" width="200px">`.
+
+## Select
+
+```python
+ui.select("Страна", "country", [
+    ui.option("Выберите...", ""),
+    ui.option("Россия", "ru"),
+    ui.option("США", "us", selected=True),
+])
+```
+
+`ui.option()` используется только внутри `options=[...]` у `ui.select()`.
+
+## Checkbox
+
+```python
+ui.checkbox("Согласен с условиями", name="terms")
+```
+
+Рендерится как чекбокс, обёрнутый в `<label>`.
+
+## Textarea
+
+```python
+ui.textarea("Комментарий", "comment", placeholder="Напишите что-нибудь...", rows=4)
+```
+
+Рендерится как `<label>` с `<textarea>` внутри.
+
+## Table
+
+```python
+ui.table(
+    headers=["Имя", "Роль"],
+    rows=[["Алиса", "Админ"], ["Боб", "Пользователь"]],
+)
+```
+
+Рендерится как `<table>` с `<thead>` и `<tbody>`.
+
+## Alert
+
+```python
+ui.alert("Сохранено!", type="success")
+```
+
+`type`: `info`, `success`, `warning`, `error`.
+
+## Badge
+
+```python
+ui.badge("Новое", type="primary")
+```
+
+`type`: `default`, `primary`, `success`, `warning`, `error`.
+
+## Card
+
+```python
+ui.card(
+    header=[ui.heading("Заголовок карточки", level=3)],
+    body=[ui.text("Содержимое карточки.")],
+    footer=[ui.button("Действие")],
+)
+```
+
+Пустые секции (`header`/`body`/`footer`) просто не рендерятся.
+
+## Navbar
+
+```python
+ui.navbar("MyApp", [
+    ("Главная", "/"),
+    ("О нас", "/about"),
+])
+```
+
+Рендерится как `<nav>` с брендом и ссылками — удобно для общей шапки на всех страницах.
+
 ## Протокол Component
 
 Вы можете создать свой компонент:
