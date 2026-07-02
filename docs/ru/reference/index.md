@@ -5,7 +5,7 @@
 ## Классы
 
 - [App](app.md) — главный класс приложения
-- [Component Protocol](../tutorial/components.md#протокол-component) — интерфейс компонента
+- [Component Protocol](../tutorial/components.md#component) — интерфейс компонента
 
 ## Модули
 
