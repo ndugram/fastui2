@@ -290,10 +290,21 @@ class App:
             list[str] | None,
             Doc("OpenAPI tags for grouping routes in documentation."),
         ] = None,
+        summary: Annotated[
+            str,
+            Doc("Short description for the OpenAPI operation summary. "
+                "Overrides the docstring-based summary."),
+        ] = "",
+        description: Annotated[
+            str,
+            Doc("Full description for the OpenAPI operation. "
+                "Overrides the docstring-based description."),
+        ] = "",
     ) -> Callable:
         """Register a page handler via decorator."""
         def decorator(func: Callable) -> Callable:
-            self._router.add(pattern, func, title=title, tags=tags)
+            self._router.add(pattern, func, title=title, tags=tags,
+                             summary=summary, description=description)
             if getattr(func, "_fastui_primary", False):
                 if self._primary_redirect_target:
                     msg = (
